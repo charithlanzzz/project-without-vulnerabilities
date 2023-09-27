@@ -59,28 +59,37 @@ public class Comment {
     }
   }
 
-  public static Boolean delete(String id) {
-    try {
-      String sql = "DELETE FROM comments where id = ?";
-      Connection con = Postgres.connection();
-      PreparedStatement pStatement = con.prepareStatement(sql);
+  public static boolean delete(String id) {
+    String sql = "DELETE FROM comments WHERE id = ?";
+
+    try (Connection con = Postgres.connection();
+         PreparedStatement pStatement = con.prepareStatement(sql)) {
+
       pStatement.setString(1, id);
-      return 1 == pStatement.executeUpdate();
-    } catch(Exception e) {
+      int rowsAffected = pStatement.executeUpdate();
+      return rowsAffected == 1;
+    } catch (SQLException e) {
       e.printStackTrace();
-    } finally {
-      return false;
+    }
+
+    return false; // Return false in case of exceptions or no rows affected
+  }
+
+
+  private boolean commit() throws SQLException {
+    String sql = "INSERT INTO comments (id, username, body, created_on) VALUES (?,?,?,?)";
+
+    try (Connection con = Postgres.connection();
+         PreparedStatement pStatement = con.prepareStatement(sql)) {
+
+      pStatement.setString(1, this.id);
+      pStatement.setString(2, this.username);
+      pStatement.setString(3, this.body);
+      pStatement.setTimestamp(4, this.created_on);
+
+      int rowsAffected = pStatement.executeUpdate();
+      return rowsAffected == 1;
     }
   }
 
-  private Boolean commit() throws SQLException {
-    String sql = "INSERT INTO comments (id, username, body, created_on) VALUES (?,?,?,?)";
-    Connection con = Postgres.connection();
-    PreparedStatement pStatement = con.prepareStatement(sql);
-    pStatement.setString(1, this.id);
-    pStatement.setString(2, this.username);
-    pStatement.setString(3, this.body);
-    pStatement.setTimestamp(4, this.created_on);
-    return 1 == pStatement.executeUpdate();
-  }
 }
