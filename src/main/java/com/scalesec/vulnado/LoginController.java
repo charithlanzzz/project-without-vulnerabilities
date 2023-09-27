@@ -26,19 +26,23 @@ public class LoginController {
   }
 }
 
-class LoginRequest implements Serializable {
-  public String username;
-  public String password;
-}
 
-class LoginResponse implements Serializable {
-  public String token;
-  public LoginResponse(String msg) { this.token = msg; }
-}
-
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-class Unauthorized extends RuntimeException {
-  public Unauthorized(String exception) {
-    super(exception);
+  class LoginRequest implements Serializable {
+    public String username;
+    public String password;
   }
-}
+
+  class LoginResponse implements Serializable {
+    public String token;
+
+    public LoginResponse(String msg) {
+      this.token = msg;
+    }
+  }
+
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  class Unauthorized extends RuntimeException {
+    public Unauthorized(String exception) {
+      super(exception);
+    }
+  }
